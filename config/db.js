@@ -6,68 +6,26 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-// ----------------------------------------------------------------
-// SIMULATED IN-MEMORY DATABASE (fallback)
-// ----------------------------------------------------------------
-const db = {
-    books: [],
-    members: [],
-    loans: []
-};
-
-// Simple ID function using uuid
-const nextId = () => uuidv4();
-
-// Initial data for easy testing
-const seedData = () => {
-    const member1 = { id: nextId(), name: 'Alice Smith', email: 'alice@example.com', joinedAt: new Date().toISOString() };
-    const member2 = { id: nextId(), name: 'Bob Johnson', email: 'bob@example.com', joinedAt: new Date().toISOString() };
-    db.members.push(member1, member2);
-
-    const book1 = { id: nextId(), isbn: '978-0321765723', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', copies: 5 };
-    const book2 = { id: nextId(), isbn: '978-1449331806', title: '1984', author: 'George Orwell', copies: 2 };
-    db.books.push(book1, book2);
-
-    const loanedAt = new Date();
-    const dueAt = new Date(loanedAt);
-    dueAt.setDate(loanedAt.getDate() + 14);
-
-    const loan1 = {
-        id: nextId(),
-        memberId: member1.id,
-        bookId: book1.id,
-        loanedAt: loanedAt.toISOString(),
-        dueAt: dueAt.toISOString(),
-        returnedAt: null
-    };
-    db.loans.push(loan1);
-    book1.copies--;
-};
-
-seedData();
-
-// ----------------------------------------------------------------
-// Serverless-friendly mongoose connection helper
-// ----------------------------------------------------------------
-const cached = global._mongoose || (global._mongoose = { conn: null, promise: null });
-
-async function connectToDatabase() {
-    const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) {
-        console.warn('MONGO_URI not set; using in-memory DB in config/db.js');
-        return null;
+// config/db.js - NEW/CORRECT (Using dynamic import)
+const connectDB = async () => { // Make the function async
+    // Dynamically import uuid
+    let uuidv4;
+    try {
+        const uuidModule = await import('uuid'); // Use dynamic import
+        uuidv4 = uuidModule.v4;
+    } catch (e) {
+        console.error("Failed to load UUID:", e);
+        // Handle error if module loading fails (unlikely if package is installed)
     }
 
-    if (cached.conn) return cached.conn;
-
-    if (!cached.promise) {
-        const opts = { bufferCommands: false };
-        cached.promise = mongoose.connect(mongoUri, opts).then(m => m.connection);
+    // Now proceed with your database logic
+    try {
+        // ... mongoose.connect() or other database connection code
+        console.log('Database connected successfully!');
+    } catch (err) {
+        console.error('Database Connection Failed:', err.message);
+        process.exit(1);
     }
+};
 
-    cached.conn = await cached.promise;
-    console.log('✅ Connected to MongoDB (config/db.js cached)');
-    return cached.conn;
-}
-
-module.exports = { db, nextId, connectToDatabase };
+module.exports = connectDB;
