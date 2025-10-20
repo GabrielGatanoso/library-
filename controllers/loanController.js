@@ -1,4 +1,4 @@
-const Loan = require('/Users/Admin/Documents/Back_end_library/models/loan');
+const Loan = require('../models/loan');
 
 const getAllLoans = async (req, res) => {
   try {

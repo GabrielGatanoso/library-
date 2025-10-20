@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllLoans, getLoanById, createLoan, deleteLoan } = require('/Users/Admin/Documents/Back_end_library/controllers/loanController');
+const { getAllLoans, getLoanById, createLoan, deleteLoan } = require('../controllers/loanController');
 
 router.get('/', getAllLoans);
 router.get('/:id', getLoanById);

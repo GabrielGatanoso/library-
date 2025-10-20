@@ -1,4 +1,4 @@
-const Book = require('/Users/Admin/Documents/Back_end_library/models/book');
+const Book = require('../models/book');
 
 const getAllBooks = async (req, res) => {
   try {

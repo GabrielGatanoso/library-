@@ -1,4 +1,4 @@
-const Member = require('/Users/Admin/Documents/Back_end_library/models/member');
+const Member = require('../models/member');
 
 const getAllMembers = async (req, res) => {
   try {
