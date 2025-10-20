@@ -15,6 +15,10 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Server is running!');
+});
+
 // Initialize DB connection (serverless-friendly helper in config/db.js)
 connectToDatabase().catch(err => console.error('❌ MongoDB connection error:', err));
 
