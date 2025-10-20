@@ -1,30 +1,21 @@
-// config/db.js
-// Centralized DB helpers. Supports an in-memory simulated DB (for tests/dev)
-// and exports connectToDatabase() which sets up a serverless-friendly
-// cached mongoose connection when MONGO_URI is provided.
+// config/db.js (Focus on core connection only)
+const mongoose = require('mongoose'); // Assuming you use Mongoose
 
-const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
-
-// config/db.js - NEW/CORRECT (Using dynamic import)
-const connectDB = async () => { // Make the function async
-    // Dynamically import uuid
-    let uuidv4;
+const connectDB = async () => {
     try {
-        const uuidModule = await import('uuid'); // Use dynamic import
-        uuidv4 = uuidModule.v4;
-    } catch (e) {
-        console.error("Failed to load UUID:", e);
-        // Handle error if module loading fails (unlikely if package is installed)
-    }
+        // Ensure you are using the environment variable for the connection string
+        await mongoose.connect(process.env.MONGO_URI, { 
+            // Include recommended options for Mongoose 
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            // (Note: useCreateIndex and useFindAndModify are often deprecated/unnecessary now)
+        });
 
-    // Now proceed with your database logic
-    try {
-        // ... mongoose.connect() or other database connection code
-        console.log('Database connected successfully!');
+        console.log('MongoDB Connected...');
     } catch (err) {
-        console.error('Database Connection Failed:', err.message);
-        process.exit(1);
+        // CRITICAL: Log error and exit if connection fails
+        console.error('Database connection error:', err.message);
+        process.exit(1); 
     }
 };
 
