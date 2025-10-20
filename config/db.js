@@ -4,7 +4,7 @@
 // cached mongoose connection when MONGO_URI is provided.
 
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 // ----------------------------------------------------------------
 // SIMULATED IN-MEMORY DATABASE (fallback)
@@ -15,8 +15,8 @@ const db = {
     loans: []
 };
 
-// Simple ID function using uuid
-const nextId = () => uuidv4();
+// Simple ID function using Node's crypto.randomUUID (CommonJS-safe)
+const nextId = () => randomUUID();
 
 // Initial data for easy testing
 const seedData = () => {
