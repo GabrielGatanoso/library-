@@ -15,7 +15,7 @@ const db = {
     loans: []
 };
 
-// Simple ID function using Node's crypto.randomUUID (CommonJS-safe)
+// Simple ID function using Node crypto.randomUUID
 const nextId = () => randomUUID();
 
 // Initial data for easy testing

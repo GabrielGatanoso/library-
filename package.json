@@ -17,8 +17,13 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongoose": "^8.19.1",
+<<<<<<< HEAD
     "nodemon": "^3.1.10"
     
+=======
+    "nodemon": "^3.1.10",
+    "uuid": "^13.0.0"
+>>>>>>> bbeaffd987ee9215811005704be02051a8085d48
   },
   "devDependencies": {
     "nodemon": "^13.1.2"
