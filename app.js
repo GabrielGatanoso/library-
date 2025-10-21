@@ -2,7 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const { connectToDatabase } = require('./config/db');
+// Require DB helpers robustly (support CommonJS and possible default export)
+const dbModule = require('./config/db');
+const connectToDatabase = dbModule && (dbModule.connectToDatabase || dbModule.default && dbModule.default.connectToDatabase);
 
 const bookRoutes = require('./routes/booksRoutes');
 const memberRoutes = require('./routes/memberRoutes');
@@ -21,7 +23,11 @@ app.get('/', (req, res) => {
 });
 
 // Initialize DB connection (serverless-friendly helper in config/db.js)
-connectToDatabase().catch(err => console.error('❌ MongoDB connection error:', err));
+if (typeof connectToDatabase === 'function') {
+  connectToDatabase().catch(err => console.error('❌ MongoDB connection error:', err));
+} else {
+  console.warn('⚠️ connectToDatabase is not available — running without MongoDB connection helper.');
+}
 
 // Routes
 app.use('/api/books', bookRoutes);
