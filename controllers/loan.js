@@ -1,8 +1,10 @@
-const Loan = require('../models/loan');
+const Loan = require('../models/loan.js');
 
 const getAllLoans = async (req, res) => {
   try {
-    const loans = await Loan.find().populate('bookId memberId');
+    const loans = await Loan.find()
+      .populate('member')
+      .populate('book');
     res.json(loans);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -11,7 +13,9 @@ const getAllLoans = async (req, res) => {
 
 const getLoanById = async (req, res) => {
   try {
-    const loan = await Loan.findById(req.params.id).populate('bookId memberId');
+    const loan = await Loan.findById(req.params.id)
+      .populate('member')
+      .populate('book');
     if (!loan) return res.status(404).json({ message: 'Loan not found' });
     res.json(loan);
   } catch (err) {
@@ -21,8 +25,7 @@ const getLoanById = async (req, res) => {
 
 const createLoan = async (req, res) => {
   try {
-    const { bookId, memberId, returnDate } = req.body;
-    const loan = new Loan({ bookId, memberId, returnDate });
+    const loan = new Loan(req.body);
     await loan.save();
     res.status(201).json(loan);
   } catch (err) {
@@ -40,4 +43,9 @@ const deleteLoan = async (req, res) => {
   }
 };
 
-module.exports = { getAllLoans, getLoanById, createLoan, deleteLoan };
+module.exports = {
+  getAllLoans,
+  getLoanById,
+  createLoan,
+  deleteLoan
+};

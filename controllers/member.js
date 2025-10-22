@@ -1,4 +1,4 @@
-const Member = require('../models/member');
+const Member = require('../models/member.js');
 
 const getAllMembers = async (req, res) => {
   try {
@@ -21,8 +21,7 @@ const getMemberById = async (req, res) => {
 
 const createMember = async (req, res) => {
   try {
-    const { name, email, age } = req.body;
-    const member = new Member({ name, email, age });
+    const member = new Member(req.body);
     await member.save();
     res.status(201).json(member);
   } catch (err) {
@@ -40,4 +39,9 @@ const deleteMember = async (req, res) => {
   }
 };
 
-module.exports = { getAllMembers, getMemberById, createMember, deleteMember };
+module.exports = {
+  getAllMembers,
+  getMemberById,
+  createMember,
+  deleteMember
+};

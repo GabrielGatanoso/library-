@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getAllLoans, getLoanById, createLoan, deleteLoan } = require('../controllers/loanController');
+const { getAllLoans, getLoanById, createLoan, deleteLoan } = require('../controllers/loan.js');
 
+// Define routes with proper handler functions
 router.get('/', getAllLoans);
 router.get('/:id', getLoanById);
 router.post('/', createLoan);

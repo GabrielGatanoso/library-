@@ -1,73 +1,52 @@
 // config/db.js
-// Centralized DB helpers. Supports an in-memory simulated DB (for tests/dev)
-// and exports connectToDatabase() which sets up a serverless-friendly
-// cached mongoose connection when MONGO_URI is provided.
-
-const mongoose = require('mongoose');
-const { randomUUID } = require('crypto');
+import { v4 as uuidv4 } from 'uuid';
 
 // ----------------------------------------------------------------
-// SIMULATED IN-MEMORY DATABASE (fallback)
+// SIMULATED IN-MEMORY DATABASE
+// In a real-world scenario, you would replace this with actual
+// database connection (e.g., MongoDB, PostgreSQL, etc.).
 // ----------------------------------------------------------------
+
 const db = {
     books: [],
     members: [],
     loans: []
 };
 
-// Simple ID function using Node crypto.randomUUID
-const nextId = () => randomUUID();
+// Simple ID function using uuid
+const nextId = () => uuidv4();
 
 // Initial data for easy testing
 const seedData = () => {
+    // 1. Members
     const member1 = { id: nextId(), name: 'Alice Smith', email: 'alice@example.com', joinedAt: new Date().toISOString() };
     const member2 = { id: nextId(), name: 'Bob Johnson', email: 'bob@example.com', joinedAt: new Date().toISOString() };
     db.members.push(member1, member2);
 
+    // 2. Books (Note: copies field is crucial for loan logic)
     const book1 = { id: nextId(), isbn: '978-0321765723', title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', copies: 5 };
     const book2 = { id: nextId(), isbn: '978-1449331806', title: '1984', author: 'George Orwell', copies: 2 };
     db.books.push(book1, book2);
 
+    // 3. Loans (Member 1 loans Book 1)
     const loanedAt = new Date();
     const dueAt = new Date(loanedAt);
-    dueAt.setDate(loanedAt.getDate() + 14);
-
+    dueAt.setDate(loanedAt.getDate() + 14); // Due in 14 days
+    
     const loan1 = {
         id: nextId(),
         memberId: member1.id,
         bookId: book1.id,
         loanedAt: loanedAt.toISOString(),
         dueAt: dueAt.toISOString(),
-        returnedAt: null
+        returnedAt: null // Not returned yet
     };
     db.loans.push(loan1);
+
+    // Decrement copy count for the loaned book
     book1.copies--;
 };
 
 seedData();
 
-// ----------------------------------------------------------------
-// Serverless-friendly mongoose connection helper
-// ----------------------------------------------------------------
-const cached = global._mongoose || (global._mongoose = { conn: null, promise: null });
-
-async function connectToDatabase() {
-    const mongoUri = process.env.MONGO_URI;
-    if (!mongoUri) {
-        console.warn('MONGO_URI not set; using in-memory DB in config/db.js');
-        return null;
-    }
-
-    if (cached.conn) return cached.conn;
-
-    if (!cached.promise) {
-        const opts = { bufferCommands: false };
-        cached.promise = mongoose.connect(mongoUri, opts).then(m => m.connection);
-    }
-
-    cached.conn = await cached.promise;
-    console.log('✅ Connected to MongoDB (config/db.js cached)');
-    return cached.conn;
-}
-
-module.exports = { db, nextId, connectToDatabase };
+export { db, nextId };
